@@ -36,11 +36,17 @@ data:
   output-azure.conf: |
     {{- range $namespace := .Values.namespaces }}
     [OUTPUT]
-        Name        azure
-        Match       *{{ $namespace.name }}*
-        Customer_ID ${LAW_{{- upper .name | replace "-" "_"}}_ID}
-        Shared_Key  ${LAW_{{- upper .name | replace "-" "_"}}_KEY}
+        name                  azure_blob
+        match                 *
+        account_name          ${{{- upper .name | replace "-" "_"}}_ACCOUNT_NAME}
+        shared_key            ${{{- upper .name | replace "-" "_"}}_ACCOUNT_KEY}
+        path                  kubernetes
+        container_name        logs
+        auto_create_container on
+        tls                   on
+
     {{- end }}
+
   parsers.conf: |
     [PARSER]
         Name   apache

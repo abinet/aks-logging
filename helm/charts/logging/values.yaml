@@ -12,8 +12,8 @@ linux:
 hasDocker: false
 namespaces: []
 #- name: ns1
-#  lawId: key1
-#  lawKey: aaa
+#  accountName: key1
+#  accountKey: aaa
 #- name: ns2
-#  lawId: key2
-#  lawKey: bbb
+#  accountName: key2
+#  accountKey: bbb
