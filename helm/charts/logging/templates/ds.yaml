@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    k8s-app: logging
+  name: logging
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: logging
+  template:
+    metadata:
+      labels:
+        k8s-app: logging
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/cm.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+    spec:
+      containers:
+        - envFrom:
+          - secretRef:
+              name: logging
+          image: {{ .Values.linux.imageName}}:{{ .Values.linux.imageTag }}
+          imagePullPolicy: Always
+          name: logging
+          ports:
+            - containerPort: 2020
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /var/log
+              name: varlog
+            - mountPath: /fluent-bit/etc/
+              name: logging
+            {{- if .Values.hasDocker }}
+            - mountPath: /var/lib/docker/containers
+              name: varlibdockercontainers
+              readOnly: true
+            {{- end }}
+      nodeSelector:
+        {{- toYaml .Values.linux.nodeSelector | nindent 8 }}
+      tolerations:
+        {{- toYaml .Values.linux.tolerations | nindent 8 }}
+      volumes:
+        - hostPath:
+            path: /var/log
+          name: varlog
+        - configMap:
+            defaultMode: 420
+            name: logging
+          name: logging
+        {{- if .Values.hasDocker }}
+        - hostPath:
+            path: /var/lib/docker/containers
+            type: ""
+          name: varlibdockercontainers
+        {{- end }}

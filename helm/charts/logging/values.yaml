@@ -1,0 +1,19 @@
+linux:
+  imageName: fluent/fluent-bit
+  imageTag: 1.7.4
+  nodeSelector:
+    kubernetes.io/os: linux
+  tolerations:
+    - effect: NoSchedule
+      operator: Exists
+    - key: CriticalAddonsOnly
+      operator: Exists
+
+hasDocker: false
+namespaces: []
+#- name: ns1
+#  lawId: key1
+#  lawKey: aaa
+#- name: ns2
+#  lawId: key2
+#  lawKey: bbb
